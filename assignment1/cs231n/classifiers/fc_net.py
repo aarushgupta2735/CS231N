@@ -221,18 +221,14 @@ class FullyConnectedNet(object):
         # beta2, etc. Scale parameters should be initialized to ones and shift     #
         # parameters should be initialized to zeros.                               #
         ############################################################################
-        
-        # Combine all dimensions into a single list to make looping easier
         layer_dims = [input_dim] + hidden_dims + [num_classes]
         
         for i in range(self.num_layers):
             layer_idx = str(i + 1)
             
-            # Initialize weights and biases
             self.params['W' + layer_idx] = np.random.normal(0, weight_scale, (layer_dims[i], layer_dims[i+1]))
             self.params['b' + layer_idx] = np.zeros(layer_dims[i+1])
             
-            # Initialize gamma and beta for Normalization (only for hidden layers, NOT the final layer)
             if self.normalization != None and i < (self.num_layers - 1):
                 self.params['gamma' + layer_idx] = np.ones(layer_dims[i+1])
                 self.params['beta' + layer_idx] = np.zeros(layer_dims[i+1])
@@ -309,17 +305,14 @@ class FullyConnectedNet(object):
         out = X
         caches = {}
         
-        # Forward pass for HIDDEN layers (1 to L-1)
         for i in range(self.num_layers - 1):
             layer_idx = str(i + 1)
             
             W = self.params['W' + layer_idx]
             b = self.params['b' + layer_idx]
             
-            # 1. Affine
             out, fc_cache = affine_forward(out, W, b)
             
-            # 2. Normalization
             norm_cache = None
             if self.normalization == 'batchnorm':
                 gamma = self.params['gamma' + layer_idx]

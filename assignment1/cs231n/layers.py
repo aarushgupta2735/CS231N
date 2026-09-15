@@ -179,7 +179,6 @@ def layernorm_forward(x, gamma, beta, ln_param):
     ###########################################################################
     # TODO: Implement the training-time forward pass for layer norm.          #
     ###########################################################################
-    # Compute mean and variance along the feature dimension (axis 1)
     mean = np.mean(x, axis=1, keepdims=True)
     var = np.var(x, axis=1, keepdims=True)
     
@@ -207,7 +206,6 @@ def layernorm_backward(dout, cache):
     dbeta = np.sum(dout, axis=0)
     dgamma = np.sum(dout * x_norm, axis=0)
 
-    # Backward pass with respect to normalized inputs (similar to batchnorm_backward_alt, but across axis 1)
     dx_norm = dout * gamma
     dvar = np.sum(dx_norm * (x - mean) * -0.5 * (var + eps)**(-1.5), axis=1, keepdims=True)
     dmean = np.sum(dx_norm * -1.0 / np.sqrt(var + eps), axis=1, keepdims=True) + dvar * np.mean(-2.0 * (x - mean), axis=1, keepdims=True)
@@ -445,12 +443,10 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
     ###########################################################################
     N, C, H, W = x.shape
     
-    # Reshape so that channels become the "features"
     x_reshaped = x.transpose(0, 2, 3, 1).reshape(N * H * W, C)
     
     out_reshaped, cache = batchnorm_forward(x_reshaped, gamma, beta, bn_param)
     
-    # Reshape back to original dimensions
     out = out_reshaped.reshape(N, H, W, C).transpose(0, 3, 1, 2)
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -492,16 +488,13 @@ def spatial_groupnorm_forward(x, gamma, beta, G, gn_param):
     ###########################################################################
     N, C, H, W = x.shape
     
-    # Reshape to group the channels: (N * G, C // G * H * W)
     x_reshaped = x.reshape(N * G, -1)
     
-    # Apply Layer Norm equivalent logic
     mean = np.mean(x_reshaped, axis=1, keepdims=True)
     var = np.var(x_reshaped, axis=1, keepdims=True)
     
     x_norm = (x_reshaped - mean) / np.sqrt(var + eps)
     
-    # Reshape back to (N, C, H, W)
     x_norm = x_norm.reshape(N, C, H, W)
     out = x_norm * gamma + beta
     
@@ -523,15 +516,12 @@ def spatial_groupnorm_backward(dout, cache):
     x_reshaped, x_norm, mean, var, gamma, eps, G = cache
     N, C, H, W = dout.shape
     
-    # Gradients for gamma and beta
     dbeta = np.sum(dout, axis=(0, 2, 3), keepdims=True)
     dgamma = np.sum(dout * x_norm, axis=(0, 2, 3), keepdims=True)
 
-    # Gradient of normalized x
     dx_norm = dout * gamma
     dx_norm_reshaped = dx_norm.reshape(N * G, -1)
     
-    # Layer norm backward logic
     D = dx_norm_reshaped.shape[1]
     
     dvar = np.sum(dx_norm_reshaped * (x_reshaped - mean) * -0.5 * (var + eps)**(-1.5), axis=1, keepdims=True)
@@ -539,7 +529,6 @@ def spatial_groupnorm_backward(dout, cache):
     
     dx_reshaped = (dx_norm_reshaped / np.sqrt(var + eps)) + (dvar * 2.0 * (x_reshaped - mean) / D) + (dmean / D)
     
-    # Reshape back to original
     dx = dx_reshaped.reshape(N, C, H, W)
     ###########################################################################
     #                             END OF YOUR CODE                            #

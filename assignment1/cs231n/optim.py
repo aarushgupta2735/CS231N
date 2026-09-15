@@ -156,7 +156,6 @@ def adam(w, dw, config=None):
     # using it in any calculations.                                           #
     ###########################################################################
     
-    # 1. Update t before any calculations
     config["t"] += 1
     t = config["t"]
     
@@ -167,22 +166,16 @@ def adam(w, dw, config=None):
     learning_rate = config["learning_rate"]
     epsilon = config["epsilon"]
 
-    # 2. Update biased first moment estimate
     m = beta1 * m + (1 - beta1) * dw
-    
-    # 3. Update biased second raw moment estimate
+
     v = beta2 * v + (1 - beta2) * (dw ** 2)
 
-    # 4. Compute bias-corrected first moment estimate
     m_hat = m / (1 - beta1 ** t)
     
-    # 5. Compute bias-corrected second raw moment estimate
     v_hat = v / (1 - beta2 ** t)
 
-    # 6. Update weights
     next_w = w - learning_rate * m_hat / (np.sqrt(v_hat) + epsilon)
 
-    # 7. Store updated values back in config
     config["m"] = m
     config["v"] = v
     
