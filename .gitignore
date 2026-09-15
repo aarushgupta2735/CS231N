@@ -1,0 +1,26 @@
+# --- CIFAR-10 / CS231n datasets ---
+cs231n/datasets/*
+!cs231n/datasets/get_datasets.sh
+CS231N/assignment1/cs231n/datasets/*
+CS231N/assignment2/cs231n/datasets/*
+assignment2/cs231n/datasets/coco_captioning/*.h5
+# --- Python bytecode / cache ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Virtual environments (if created inside the repo) ---
+venv/
+env/
+.venv/
+
+# --- OS junk ---
+.DS_Store
+Thumbs.db
+
+# --- Editor settings (optional, uncomment if you don't want to track these) ---
+# .vscode/
+# .idea/
